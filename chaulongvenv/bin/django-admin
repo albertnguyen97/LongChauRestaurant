@@ -1,4 +1,4 @@
-#!/home/nevergiveup/PycharmProjects/chaulongrestaurant/chaulong/chaulongvenv/bin/python3
+#!/home/nevergiveup/PycharmProjects/LongChauRestaurant/chaulongvenv/bin/python3.10
 # -*- coding: utf-8 -*-
 import re
 import sys

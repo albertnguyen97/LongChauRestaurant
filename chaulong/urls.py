@@ -20,11 +20,10 @@ from rest_framework_simplejwt.views import TokenBlacklistView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('account/', include('account.urls')),
     path('', include('restaurant.urls')),
     path('api/', include('chaulongAPI.urls')),
-    path('auth/', include('djoser.urls')),
-    path('auth/', include('djoser.urls.authtoken')),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),
+    path('social-auth/',
+         include('social_django.urls', namespace='social')),
+    path('eat-in/', include('eat_in_restaurant.urls')),
 ]

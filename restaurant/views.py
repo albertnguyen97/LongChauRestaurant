@@ -77,15 +77,3 @@ def display_menu_item(request, pk=None):
     return render(request, 'menu_item.html', {"menu_item": menu_item})
 
 
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('home')  # Change 'home' to your desired URL
-        else:
-            messages.error(request, 'Invalid login credentials')
-
-    return render(request, 'login.html')

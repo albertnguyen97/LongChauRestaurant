@@ -10,5 +10,4 @@ urlpatterns = [
     path('menu/', views.menu, name="menu"),
     path('menu_item/<int:pk>/', views.display_menu_item, name="menu_item"),
     path('bookings/', views.bookings, name="bookings"),
-    path('login/', views.login_view, name='login'),
 ]
