@@ -1,0 +1,29 @@
+<!-- order_confirmed.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <div>
+    <h1>Order Confirmed</h1>
+
+    <p>Thank you for placing your order!</p>
+
+    <h2>Confirmed Order Details:</h2>
+
+    <ul>
+      <li>Selected Dishes:
+        <ul>
+          {% for dish in selected_dishes %}
+            <li>{{ dish.name }} - {{ dish.description }}</li>
+          {% endfor %}
+        </ul>
+      </li>
+
+      <li>Total Amount: ${{ discounted_total }}</li>
+    </ul>
+
+    <!-- You can include additional information or links as needed -->
+
+    <p>Your order will be prepared and served shortly. Enjoy your meal!</p>
+  </div>
+{% endblock %}

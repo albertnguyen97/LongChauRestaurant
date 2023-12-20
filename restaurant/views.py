@@ -11,7 +11,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
 
-
 # Create your views here.
 def home(request):
     return render(request, 'index.html')
@@ -60,6 +59,7 @@ def bookings(request):
     # Return rendering of HTML template with reservation data in context
     return HttpResponse(booking_json, content_type='application/json')
 
+
 # Add your code here to create new views
 
 
@@ -75,5 +75,3 @@ def display_menu_item(request, pk=None):
     else:
         menu_item = ""
     return render(request, 'menu_item.html', {"menu_item": menu_item})
-
-

@@ -1,0 +1,30 @@
+<!-- ingredient_detail.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ ingredient.name }} - Ingredient Detail</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+<div class="ingredient-detail">
+    <h1>{{ ingredient.name }} - Ingredient Detail</h1>
+
+    <img src="{{ ingredient.image.url }}" alt="{{ ingredient.name }} Image" class="ingredient-image">
+
+    <p><strong>Category:</strong> {{ ingredient.category.name }}</p>
+    <p><strong>Quantity:</strong> {{ ingredient.quantity_product }} units</p>
+    <p><strong>Description:</strong> {{ ingredient.description }}</p>
+    <p><strong>Price:</strong> ${{ ingredient.price }}</p>
+    <p><strong>Address:</strong> {{ ingredient.address }}</p>
+
+    <p><strong>Available:</strong> {% if ingredient.available %}Yes{% else %}No{% endif %}</p>
+    <p><strong>Created:</strong> {{ ingredient.created }}</p>
+    <p><strong>Updated:</strong> {{ ingredient.updated }}</p>
+</div>
+
+</body>
+</html>

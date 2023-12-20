@@ -1,0 +1,116 @@
+/* choose_food_items_styles.css */
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+.choose-dish-container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+    color: #333;
+}
+
+p {
+    color: #666;
+}
+
+.dish-list {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Distribute items evenly */
+}
+
+.dish-list li {
+    box-sizing: border-box;
+    width: calc(50% - 10px); /* Adjust the width as needed with margin */
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    text-align: center;
+
+
+}
+
+
+.dish-box {
+    display: inline-block; /* Make it an inline block to center horizontally */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    height: 200px;
+    width: 180px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    vertical-align: middle; /* Align in the middle vertically */
+}
+
+img {
+    width: 100%;
+    max-width: 180px;
+    height: 180px;
+    display: block;
+    border-bottom: 1px solid #ddd; /* Border between image and name */
+}
+
+.dish-name {
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.quantity-control {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.quantity-btn {
+    background-color: #eee;
+    color: #333;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #ddd;
+}
+
+input {
+    width: 40px;
+    text-align: center;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    padding: 5px;
+}
+
+button[type="submit"] {
+    background-color: #4CAF50; /* Green background color */
+    color: white; /* White text color */
+    padding: 10px 20px; /* Padding for better appearance */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Add rounded corners */
+    cursor: pointer; /* Add a pointer cursor on hover */
+    font-size: 16px; /* Set font size */
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049; /* Darker green on hover */
+}

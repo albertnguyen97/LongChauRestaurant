@@ -1,0 +1,26 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingredient List</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+<div class="ingredient-list">
+    <h1>Ingredient List</h1>
+
+    <ul>
+        {% for ingredient in ingredients %}
+            <li>
+                <a href="{% url 'ingredient_detail' ingredient.id %}">{{ ingredient.name }}</a> - {{ ingredient.quantity_product }} units
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+</body>
+</html>

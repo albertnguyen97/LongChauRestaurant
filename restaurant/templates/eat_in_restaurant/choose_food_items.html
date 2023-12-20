@@ -1,25 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Choose Food Items</title>
+    <title>Dish List</title>
+    <link rel="stylesheet" href="{% static 'css/choose_food_items_styles.css' %}">
 </head>
 <body>
+
+<div class="choose-dish-container">
     <h1>Choose Food Items</h1>
-    <form method="post">
+
+    <p>Selected Table: {{ selected_table }}</p>
+
+    <form method="post" action="{% url 'eat_in_restaurant:order_check' %}">
         {% csrf_token %}
-        {{ food_items|length }} available food items for Table {{ selected_table }}:
-        <ul>
-            {% for item in food_items %}
+
+        <h2>Dishes:</h2>
+
+        <ul class="dish-list">
+            {% for dish in food_items %}
                 <li>
-                    <input type="checkbox" name="food_items" value="{{ item.id }}" id="food_item_{{ item.id }}">
-                    <label for="food_item_{{ item.id }}">{{ item.name }} - ${{ item.price }}</label>
+                    <label>
+                        <div class="dish-box">
+                            <img src="{{ dish.image.url }}" alt="{{ dish.name }}">
+                            <span class="dish-name">{{ dish.name }} - {{ dish.price}}</span>
+                        </div>
+                        <div class="quantity-control">
+                            <button type="button" class="quantity-btn" data-action="decrement">-</button>
+                            <input type="number" name="quantity_{{ dish.id }}" value="0" min="0" max="99" readonly>
+                            <button type="button" class="quantity-btn" data-action="increment">+</button>
+                        </div>
+                    </label>
                 </li>
             {% endfor %}
         </ul>
-        {{ order_form.as_p }}
-        <button type="submit">Place Order</button>
+
+        <button type="submit">Order</button>
     </form>
+</div>
+
+<script>
+    // JavaScript for quantity control
+    document.addEventListener('DOMContentLoaded', function () {
+        const quantityControls = document.querySelectorAll('.quantity-control');
+
+        quantityControls.forEach(control => {
+            const input = control.querySelector('input');
+            const incrementBtn = control.querySelector('[data-action="increment"]');
+            const decrementBtn = control.querySelector('[data-action="decrement"]');
+
+            incrementBtn.addEventListener('click', () => {
+                input.value = parseInt(input.value) + 1;
+            });
+
+            decrementBtn.addEventListener('click', () => {
+                const currentValue = parseInt(input.value);
+                input.value = currentValue > 0 ? currentValue - 1 : 0;
+            });
+        });
+    });
+</script>
+
 </body>
 </html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Check</title>
+</head>
+<body>
+
+<h1>Order Check</h1>
+
+<p>Selected Table: {{ selected_table }}</p>
+
+<h2>Selected Dishes and Quantities</h2>
+<ul>
+    {% for dish, quantity in selected_dishes_quantities.items %}
+        <li>{{ dish.name }} - Quantity: {{ quantity }}</li>
+    {% endfor %}
+</ul>
+
+<h2>Returned Dishes</h2>
+{% if returned_dishes %}
+    <ul>
+        {% for dish in returned_dishes %}
+            <li>{{ dish.name }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No dishes can be returned.</p>
+{% endif %}
+
+<h2>Discount Information</h2>
+<p>Discount Percentage: {{ discount_percentage }}%</p>
+<p>Discounted Total: ${{ discounted_total }}</p>
+
+</body>
+</html>
+

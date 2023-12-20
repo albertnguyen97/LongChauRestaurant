@@ -17,13 +17,19 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.views import TokenBlacklistView
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('account/', include('account.urls')),
+    path('warehouse/', include('warehouse.urls')),  # Replace 'your_app' with your actual app name
     path('', include('restaurant.urls')),
     path('api/', include('chaulongAPI.urls')),
     path('social-auth/',
          include('social_django.urls', namespace='social')),
     path('eat-in/', include('eat_in_restaurant.urls')),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

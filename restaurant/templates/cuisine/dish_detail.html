@@ -1,0 +1,26 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ dish.name }} - Dish Details</title>
+    <link rel="stylesheet" href="{% static 'css/dish_styles.css' %}">
+</head>
+<body>
+
+<div class="dish-details">
+    <h1>{{ dish.name }}</h1>
+    <p>{{ dish.description }}</p>
+
+    <h2>Ingredients:</h2>
+    <ul>
+        {% for ingredient in dish.ingredients.all %}
+            <li>{{ ingredient.name }} - {{ ingredient.quantity_product }} units</li>
+        {% endfor %}
+    </ul>
+</div>
+
+</body>
+</html>
