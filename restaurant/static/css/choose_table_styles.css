@@ -40,3 +40,66 @@ button {
 button:hover {
     background-color: #45a049;
 }
+
+/* choose_table_styles.css */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+#tableMap {
+    width: 100%;
+    height: 400px;
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    margin-top: 20px;
+}
+
+.table-marker {
+    width: 30px;
+    height: 30px;
+    background-color: #3498db;
+    border-radius: 50%;
+    position: absolute;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* Add styling for the selected table marker */
+.table-marker.selected {
+    background-color: #e74c3c;
+}
+
+form {
+    text-align: center;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Add any additional styles as needed */
+

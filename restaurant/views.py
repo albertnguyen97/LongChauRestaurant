@@ -2,14 +2,15 @@
 import json
 from datetime import datetime
 from django.core import serializers
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Menu, Booking
 from .forms import BookingForm
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-
+from warehouse.models import Dish
+from cart.forms import CartAddDishForm
 
 # Create your views here.
 def home(request):
@@ -64,14 +65,13 @@ def bookings(request):
 
 
 def menu(request):
-    menu_data = Menu.objects.all()
+    menu_data = Dish.objects.all()
     main_data = {"menu": menu_data}
     return render(request, 'menu.html', main_data)
 
 
-def display_menu_item(request, pk=None):
-    if pk:
-        menu_item = Menu.objects.get(pk=pk)
-    else:
-        menu_item = ""
-    return render(request, 'menu_item.html', {"menu_item": menu_item})
+def display_menu_item(request, id):
+    dish = get_object_or_404(Dish, id=id, is_available=True)
+    cart_dish_form = CartAddDishForm()
+    return render(request, 'menu_item.html', {'dish': dish, 'cart_dish_form': cart_dish_form})
+

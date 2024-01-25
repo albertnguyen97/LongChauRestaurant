@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/choose_food_items_styles.css' %}">
+    <title>Order Check</title>
+</head>
+<body>
+
+<h1>Order Check</h1>
+
+<p>Selected Table: {{ selected_table }}</p>
+
+<h2>Selected Dishes and Quantities</h2>
+{% if selected_dishes_quantities %}
+    <ul>
+        {% for dish, quantity in selected_dishes_quantities.items %}
+            <li>{{ dish.name }} - Quantity: {{ quantity }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Returned Dishes</h2>
+    {% if returned_dishes %}
+        <ul>
+            {% for dish in returned_dishes %}
+                <li>{{ dish.name }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No dishes can be returned.</p>
+    {% endif %}
+
+    <h2>Discount Information</h2>
+    <p>Discount Percentage: {{ discount_percentage }}%</p>
+    <p>Discounted Total: VND{{ discounted_total }}</p>
+
+    <!-- Finish Button Form -->
+    <form method="post" action="{% url 'eat_in_restaurant:mark_table_not_booked' %}">
+        {% csrf_token %}
+        <button type="submit" {% if not selected_dishes_quantities %}disabled{% endif %}>Finish</button>
+    </form>
+{% else %}
+    <p>No dishes finished. Please go back and select some dishes.</p>
+    <p>Chưa có món ăn nào được mang ra xin quý khách vui lòng chờ đợi giây lát</p>
+{% endif %}
+
+</body>
+</html>
+
+
+

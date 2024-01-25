@@ -1,9 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/order_check_styles.css' %}">
     <title>Order Check</title>
 </head>
 <body>
@@ -32,7 +34,7 @@
 
 <h2>Discount Information</h2>
 <p>Discount Percentage: {{ discount_percentage }}%</p>
-<p>Discounted Total: ${{ discounted_total }}</p>
+<p>Discounted Total: VND{{ discounted_total }}</p>
 
 </body>
 </html>

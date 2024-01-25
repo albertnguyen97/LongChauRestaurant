@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'restaurant',
     'eat_in_restaurant',
     'warehouse',
+    'cart.apps.CartConfig',
+    'order_cart',
     'chaulongAPI',
     'django_filters',
     'djoser',
@@ -76,6 +78,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'cart.context_processors.cart',
             ],
         },
     },
@@ -119,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+CART_SESSION_ID = 'cart'
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 

@@ -1,29 +1,30 @@
-<!-- order_confirmed.html -->
+<!-- order_confirmation.html -->
 
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+</head>
+<body>
 
-{% block content %}
-  <div>
-    <h1>Order Confirmed</h1>
+    <h1>Order Confirmation</h1>
 
-    <p>Thank you for placing your order!</p>
-
-    <h2>Confirmed Order Details:</h2>
-
+    <h2>Selected Dishes</h2>
     <ul>
-      <li>Selected Dishes:
-        <ul>
-          {% for dish in selected_dishes %}
-            <li>{{ dish.name }} - {{ dish.description }}</li>
-          {% endfor %}
-        </ul>
-      </li>
-
-      <li>Total Amount: ${{ discounted_total }}</li>
+        {% for dish, quantity in selected_finished_dishes_quantities.items %}
+            <li>{{ dish.name }} - Quantity: {{ quantity }}</li>
+        {% endfor %}
     </ul>
 
-    <!-- You can include additional information or links as needed -->
+    <p>Total: ${{ discounted_total }}</p>
 
-    <p>Your order will be prepared and served shortly. Enjoy your meal!</p>
-  </div>
-{% endblock %}
+    <form method="post" action="{% url 'eat_in_restaurant:checkout' %}">
+        {% csrf_token %}
+        <input type="submit" value="Checkout">
+    </form>
+
+</body>
+</html>
+

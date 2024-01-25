@@ -1,9 +1,16 @@
-# eat_in_app/forms.py
 from django import forms
+from .models import Table  # Replace `.models` with the actual path to your models
 
 
 class TableForm(forms.Form):
-    table = forms.CharField(label='Select Table', widget=forms.Select(choices=[('table1', 'Table 1'), ('table2', 'Table 2')]))
+    table_choices = [(table.table_id, f'Table {table.table_id}') for table in Table.objects.filter(booked=False)]
+
+    table = forms.ChoiceField(
+        label='Select Table',
+        choices=[('', 'Select a Table')] + table_choices,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True
+    )
 
 
 class OrderForm(forms.Form):

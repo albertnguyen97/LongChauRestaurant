@@ -20,3 +20,4 @@ def ingredient_list(request):
 def ingredient_detail(request, ingredient_id):
     ingredient = get_object_or_404(Ingredient, id=ingredient_id)
     return render(request, 'cuisine/ingredient_detail.html', {'ingredient': ingredient})
+

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}
+  Cảm ơn bạn
+{% endblock %}
+{% block content %}
+  <h1>Cảm ơn bạn</h1>
+  <p>Chúng tôi rất vui thông báo rằng đơn hàng của bạn đã được xác nhận và đang được chuẩn bị để gửi đi.</p>
+  <p>Chi tiết đơn hàng của bạn:</p>
+  <ul>
+    {% for item in cart %}
+      <li>
+        {{ item.quantity }}x {{ item.dish.name }}
+        <span>{{ item.total_price }} VND</span>
+      </li>
+    {% endfor %}
+  </ul>
+  <p>Tổng cộng: {{ cart.get_total_price }} VND</p>
+  <p>Chúng tôi sẽ gửi hàng của bạn với hình thức "Ship COD" (Thanh toán khi nhận hàng). Bạn có thể thanh toán cho đơn hàng của mình khi nhận hàng từ nhân viên giao hàng.</p>
+  <p>Chúc các bạn ngon miệng và hãy thưởng thức bữa ăn thú vị của mình!</p>
+  <p>Cảm ơn bạn đã lựa chọn dịch vụ của chúng tôi. Nếu bạn có bất kỳ câu hỏi hoặc cần hỗ trợ nào, hãy liên hệ với chúng tôi qua thông tin dưới đây.</p>
+  <p>Trân trọng,<br>
+  Châu Long Restaurant</p>
+{% endblock %}

@@ -1,14 +1,24 @@
-# eat_in_app/models.py
 from django.db import models
-from warehouse.models import Dish, Category  # Import the FoodItem model
+from warehouse.models import Dish, Distributor, Category # Import the FoodItem model
 
 
-class MenuItem(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField()
-    price = models.DecimalField(max_digits=8, decimal_places=2)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    food_item = models.ForeignKey(Dish, on_delete=models.SET_NULL, null=True, blank=True)
+class Table(models.Model):
+    table_id = models.IntegerField(primary_key=True)
+    booked = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.name
+        return f"{self.table_id}"
+
+
+class Order(models.Model):
+    selected_table = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"Order for Table {self.selected_table}"
+
+
+class Queue(models.Model):
+    table_number = models.ForeignKey(Table, on_delete=models.CASCADE, to_field='table_id')
+    dish = models.ForeignKey(Dish, on_delete=models.CASCADE)
+    is_cooked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)  # Add this line to include a creation timestamp

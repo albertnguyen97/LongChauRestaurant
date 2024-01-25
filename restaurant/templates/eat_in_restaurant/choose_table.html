@@ -1,6 +1,5 @@
 {% load static %}
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,14 +7,144 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="{% static 'css/choose_table_styles.css' %}">
+    <style>
+        /* Add your CSS styles for the map container here */
+        #tableMap {
+            width: 750px; /* Set the width of your image */
+            height: 531px; /* Set the height of your image */
+            position: relative;
+            margin-top: 20px;
+        }
+        .table-marker {
+            width: 30px;
+            height: 30px;
+            background-color: #3498db;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+        }
+        .table-marker.booked {
+            background-color: #e74c3c;
+        }
+        .table-marker.selected {
+            background-color: #e74c3c; /* You can modify this color as needed */
+        }
+        /* Add any additional styles as needed */
+    </style>
     <title>Choose Table</title>
 </head>
 <body>
     <h1>Choose Table</h1>
+    <div id="tableMap">
+        <img src="{% static 'img/table_map.png' %}" alt="Table Map" style="width: 100%; height: 100%;">
+    </div>
+
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
+        <input type="hidden" id="selectedTable" name="selectedTable" value="">
         <button type="submit">Next</button>
     </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tableMap = document.getElementById('tableMap');
+            const selectedTableInput = document.getElementById('selectedTable');
+            const form = document.querySelector('form');
+            const tableMarkers = [
+                { id: 1, left: '10%', top: '10%' },
+                { id: 2, left: '30%', top: '10%' },
+                { id: 3, left: '65%', top: '10%' },
+                { id: 4, left: '85%', top: '10%' },
+                { id: 5, left: '5%', top: '30%' },
+                { id: 6, left: '5%', top: '50%' },
+                { id: 7, left: '5%', top: '70%' },
+                { id: 8, left: '25%', top: '30%' },
+                { id: 9, left: '40%', top: '30%' },
+                { id: 10, left: '25%', top: '45%' },
+                { id: 11, left: '40%', top: '45%' },
+                { id: 12, left: '25%', top: '60%' },
+                { id: 13, left: '40%', top: '60%' },
+                { id: 14, left: '60%', top: '30%' },
+                { id: 15, left: '60%', top: '45%' },
+                { id: 16, left: '60%', top: '60%' },
+                { id: 17, left: '70%', top: '30%' },
+                { id: 18, left: '70%', top: '45%' },
+                { id: 19, left: '70%', top: '60%' },
+                { id: 20, left: '90%', top: '30%' },
+                { id: 21, left: '90%', top: '40%' },
+                { id: 22, left: '90%', top: '50%' },
+                { id: 23, left: '90%', top: '60%' },
+                // Add more table markers as needed
+            ];
+
+            tableMarkers.forEach(marker => {
+                const tableMarker = document.createElement('div');
+                tableMarker.className = 'table-marker';
+                tableMarker.style.left = marker.left;
+                tableMarker.style.top = marker.top;
+                tableMarker.innerText = marker.id; // Add the table number
+
+                // Check if the table is booked and mark it as booked
+                if (isTableBooked(marker.id)) {
+                    tableMarker.classList.add('booked');
+                }
+
+                // Add click event to select the table
+                tableMarker.addEventListener('click', function () {
+                    selectedTableInput.value = marker.id;
+
+                    // Example: Remove styling from previously selected tables
+                    document.querySelectorAll('.table-marker').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+
+                    // Example: Add styling to the selected table marker
+                    tableMarker.classList.add('selected');
+                });
+
+                tableMap.appendChild(tableMarker);
+            });
+
+            form.addEventListener('submit', function (event) {
+                // Ensure a table is selected before submitting the form
+                if (!selectedTableInput.value) {
+                    alert("Please select a table before proceeding.");
+                    event.preventDefault(); // Prevent the form from submitting
+                    return;
+                }
+
+                // Your form submission logic here (e.g., using AJAX)
+                // For demonstration purposes, alert the selected table ID
+                alert("Selected Table: " + selectedTableInput.value);
+
+                // Reset the selected table styling if needed
+                document.querySelectorAll('.table-marker').forEach(el => {
+                    el.classList.remove('selected');
+                });
+
+                // Clear the selected table value
+                selectedTableInput.value = '';
+            });
+
+            function isTableBooked(tableId) {
+                // Check the booked status of each table
+                {% for table in tables %}
+                    {% if table.booked %}
+                        if (tableId === {{ table.table_id }}) {
+                            return true; // Booked table
+                        }
+                    {% endif %}
+                {% endfor %}
+                return false; // Not booked
+            }
+
+        });
+    </script>
 </body>
 </html>

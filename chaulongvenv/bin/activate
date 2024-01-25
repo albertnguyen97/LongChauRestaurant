@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/home/nevergiveup/PycharmProjects/chaulongrestaurant/chaulong/chaulongvenv"
+VIRTUAL_ENV="/home/bigcat/PycharmProjects/chaulong/chaulongvenv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

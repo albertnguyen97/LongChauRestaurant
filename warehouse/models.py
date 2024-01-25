@@ -1,17 +1,41 @@
 from django.db import models
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
-
-class Category(models.Model):
+class Distributor(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ['name']
+        indexes = [
+            models.Index(fields=['name']),
+        ]
+        verbose_name = 'category'
+        verbose_name_plural = 'categories'
+
+    def __str__(self):
+        return self.name
+
+
+def validate_exp_greater_than_mfg(value):
+    if value < models.F('mfg'):
+        raise ValidationError(
+            _("Ngày hết hạn phải sau ngày sản xuất. ")
+        )
+
+
 class Ingredient(models.Model):
-    category = models.ForeignKey(Category,
-                                 related_name='products',
-                                 on_delete=models.CASCADE)
+    distributor = models.ForeignKey(Distributor,
+                                    related_name='products',
+                                    on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200)
     quantity_product = models.PositiveIntegerField(default=0)
@@ -24,6 +48,8 @@ class Ingredient(models.Model):
     available = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    mfg = models.DateField(blank=True, null=True, default='2023-04-04')
+    exp = models.DateField(blank=True, null=True, default='2025-04-04')
 
     def __str__(self):
         return self.name
@@ -34,10 +60,14 @@ class Dish(models.Model):
     description = models.TextField(max_length=1000)
     image = models.ImageField(upload_to='dishes/%Y/%m/%d', blank=True)
     ingredients = models.ManyToManyField(Ingredient)
+    is_available = models.BooleanField(default=True)
     returnable = models.BooleanField(default=True)
     price = models.DecimalField(max_digits=10,
                                 decimal_places=2, default=0)
-
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('restaurant:display_menu_item', arg='self.id')

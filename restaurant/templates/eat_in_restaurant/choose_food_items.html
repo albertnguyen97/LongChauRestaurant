@@ -1,4 +1,5 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,15 +18,30 @@
     <form method="post" action="{% url 'eat_in_restaurant:order_check' %}">
         {% csrf_token %}
 
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search...">
+            <button type="button" onclick="searchDishes()">Search</button>
+        </div>
+        <div class="filter-container">
+            <label>Filter by Category:</label>
+            <select id="categoryFilter">
+                <option value="all">All</option>
+                {% for category in menu_categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
         <h2>Dishes:</h2>
 
-        <ul class="dish-list">
+        <ul class="dish-list" id="dishList">
             {% for dish in food_items %}
-                <li>
+                <li data-category="{{ dish.category.id }}">
                     <label>
                         <div class="dish-box">
                             <img src="{{ dish.image.url }}" alt="{{ dish.name }}">
-                            <span class="dish-name">{{ dish.name }} - {{ dish.price}}</span>
+                            <span class="dish-name">{{ dish.name }}</span>
+                            <span class="dish-name">{{ dish.price }} VND</span>
                         </div>
                         <div class="quantity-control">
                             <button type="button" class="quantity-btn" data-action="decrement">-</button>
@@ -36,12 +52,42 @@
                 </li>
             {% endfor %}
         </ul>
-
-        <button type="submit">Order</button>
+        <div class="form-buttons">
+            <button type="submit">Order</button>
+            <a href="{% url 'eat_in_restaurant:show_finished_dishes' %}" class="show-finished-btn">Show Finished Dishes</a>
+        </div>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
     </form>
+    <a href="{% url 'eat_in_restaurant:checkout_finished_dishes' %}" class="show-finished-btn">Check out</a>
 </div>
-
+<div class="finished-dishes-container">
+  <h2>Finished Dishes</h2>
+  <ul id="finishedDishesList">
+    <!-- Finished dishes will be displayed here dynamically using JavaScript -->
+  </ul>
+</div>
 <script>
+    function searchDishes() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toUpperCase();
+        const dishList = document.getElementById('dishList');
+        const dishes = dishList.getElementsByTagName('li');
+
+        for (let i = 0; i < dishes.length; i++) {
+            const dishName = dishes[i].getElementsByClassName('dish-name')[0];
+            if (dishName.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                dishes[i].style.display = '';
+            } else {
+                dishes[i].style.display = 'none';
+            }
+        }
+    }
     // JavaScript for quantity control
     document.addEventListener('DOMContentLoaded', function () {
         const quantityControls = document.querySelectorAll('.quantity-control');
@@ -60,6 +106,49 @@
                 input.value = currentValue > 0 ? currentValue - 1 : 0;
             });
         });
+        showFinishedDishes();
+
+    });
+
+    // JavaScript for search functionality
+    setTimeout(function() {
+        document.querySelectorAll('.messages li').forEach(function(element) {
+            element.style.display = 'none';
+        });
+    }, 5000);
+    document.getElementById('categoryFilter').addEventListener('change', function () {
+        var selectedCategory = this.value;
+        var dishList = document.getElementById('dishList').getElementsByTagName('li');
+
+        for (var i = 0; i < dishList.length; i++) {
+            var dishCategory = dishList[i].getAttribute('data-category');
+
+            if (selectedCategory === 'all' || dishCategory === selectedCategory) {
+                dishList[i].style.display = 'block';
+            } else {
+                dishList[i].style.display = 'none';
+            }
+        }
+    });
+
+    function showFinishedDishes() {
+        fetch("{% url 'eat_in_restaurant:show_finished_dishes' %}")
+          .then(response => response.json())
+          .then(data => {
+            const finishedDishesList = document.getElementById("finishedDishesList");
+            finishedDishesList.innerHTML = ""; // Clear existing list
+
+            data.finished_dishes.forEach(dish => {
+              const listItem = document.createElement("li");
+              listItem.textContent = dish;
+              finishedDishesList.appendChild(listItem);
+            });
+          });
+    }
+
+    document.querySelector('.show-finished-btn').addEventListener('click', function(event) {
+        event.preventDefault();  // Prevent the default behavior of the link
+        showFinishedDishes();  // Call the function to show finished dishes
     });
 </script>
 

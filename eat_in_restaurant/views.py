@@ -1,33 +1,56 @@
-from django.shortcuts import render, redirect
-from warehouse.models import Dish
+from django.shortcuts import render, redirect, get_object_or_404
+from warehouse.models import Dish, Category
 from .forms import TableForm, OrderForm
 from decimal import Decimal
+from django.shortcuts import render, redirect
+from warehouse.models import Dish, Category
+from .models import Table, Queue
+from .forms import TableForm, OrderForm
+from decimal import Decimal
+from django.contrib import messages  # Import messages module
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
 
+@login_required
 def choose_table(request):
     if request.method == 'POST':
         form = TableForm(request.POST)
         if form.is_valid():
-            selected_table = form.cleaned_data['table']
-            request.session['selected_table'] = selected_table
+            selected_table_id = form.cleaned_data['table']
+
+            # Get the selected table object
+            selected_table = Table.objects.get(table_id=selected_table_id)
+
+            # Update the booked status to True
+            selected_table.booked = True
+            selected_table.save()
+
+            # Store the selected table in session
+            request.session['selected_table'] = selected_table_id
+
+            # Redirect to the next page (choose_food_items)
             return redirect('eat_in_restaurant:choose_food_items')
     else:
         form = TableForm()
+    tables = Table.objects.all()
+    return render(request, 'eat_in_restaurant/choose_table.html', {'form': form, 'tables': tables})
 
-    return render(request, 'eat_in_restaurant/choose_table.html', {'form': form})
 
-
+@login_required
 def choose_food_items(request):
     selected_table = request.session.get('selected_table')
     if not selected_table:
         return redirect('eat_in_restaurant:choose_table')
 
     dishes = Dish.objects.all()
+    menu_categories = Category.objects.all()
 
     return render(request, 'eat_in_restaurant/choose_food_items.html', {'food_items': dishes,
+                                                                        'menu_categories':  menu_categories,
                                                                         'selected_table': selected_table})
 
-
+@login_required
 def order_check(request):
     if request.method == 'POST':
         selected_table = request.session.get('selected_table')
@@ -54,19 +77,13 @@ def order_check(request):
             # Replace this with your actual logic for applying discounts
         discount_percentage = Decimal('10')  # Assuming a 10% discount
         discounted_total = calculate_discounted_total(selected_dishes_quantities, discount_percentage)
+        for dish, quantity in selected_dishes_quantities.items():
+            for _ in range(quantity):
+                Queue.objects.create(table_number=Table.objects.get(table_id=selected_table),
+                                     dish=dish,
+                                     is_cooked=False)  # Set is_cooked to False initially
 
-        # Handling deletion of returned dishes
-        # Example logic for applying a discount
-        # Replace this with your actual logic for applying discounts
-
-        # Render the order_check template with the necessary data
-        return render(request, 'eat_in_restaurant/order_check.html', {
-            'selected_table': selected_table,
-            'selected_dishes_quantities': selected_dishes_quantities,
-            'returned_dishes': returned_dishes,
-            'discount_percentage': discount_percentage,
-            'discounted_total': discounted_total,
-        })
+        messages.success(request, 'Đã gọi món thành công. Vui lòng chờ một chút.')
 
     return redirect('eat_in_restaurant:choose_food_items')
 
@@ -79,10 +96,23 @@ def calculate_discounted_total(selected_dishes_quantities, discount_percentage):
     return discounted_total
 
 
-def order_confirmed(request):
+@login_required
+def checkout_confirmed(request):
     # Retrieve necessary data from the request or session
     selected_dishes = request.session.get('selected_dishes')
     discounted_total = request.session.get('discounted_total')
+
+    # Retrieve the selected table ID from the session
+    selected_table_id = request.session.get('selected_table')
+
+    # Set the booked status of the selected table back to False
+    if selected_table_id is not None:
+        selected_table = Table.objects.get(table_id=selected_table_id)
+        selected_table.booked = False
+        selected_table.save()
+
+        # Remove the selected table from the session
+        del request.session['selected_table']
 
     # You can perform additional processing here if needed
 
@@ -91,3 +121,69 @@ def order_confirmed(request):
         'selected_dishes': selected_dishes,
         'discounted_total': discounted_total,
     })
+
+
+def save_food_order(request):
+    if request.method == 'POST':
+        # Retrieve selected dishes from session
+        selected_dishes_quantities = request.session.get('selected_dishes_quantities', {})
+
+        request.session.pop('selected_dishes_quantities', None)
+
+        # Redirect to a thank you page or back to the main page
+        return redirect('eat_in_restaurant:choose_food_items')
+
+
+@login_required
+def show_finished_dishes(request):
+    selected_table_id = request.session.get('selected_table')
+
+    # Ensure there is a selected table
+    if not selected_table_id:
+        return JsonResponse({'finished_dishes': []})
+
+    selected_table = get_object_or_404(Table, table_id=selected_table_id)
+    finished_dishes = Queue.objects.filter(table_number=selected_table, is_cooked=True)
+    finished_dishes_list = [dish.dish.name for dish in finished_dishes]
+
+    return JsonResponse({'finished_dishes': finished_dishes_list})
+
+
+@login_required
+def checkout_finished_dishes(request):
+    selected_table_id = request.session.get('selected_table')
+
+    # Ensure there is a selected table
+    if not selected_table_id:
+        return redirect('eat_in_restaurant:choose_food_items')
+
+    selected_table = get_object_or_404(Table, table_id=selected_table_id)
+    finished_dishes = Queue.objects.filter(table_number=selected_table, is_cooked=True)
+
+    # Calculate total price for finished dishes
+    total_price = sum(dish.dish.price for dish in finished_dishes)
+
+    return render(request, 'eat_in_restaurant/checkout_finished_dishes.html', {
+        'selected_table': selected_table,
+        'finished_dishes': finished_dishes,
+        'total_price': total_price,
+    })
+
+
+def mark_table_not_booked(request):
+    selected_table_id = request.session.get('selected_table')
+
+    # Ensure there is a selected table
+    if not selected_table_id:
+        return redirect('eat_in_restaurant:choose_food_items')
+
+    selected_table = get_object_or_404(Table, table_id=selected_table_id)
+    selected_table.booked = False
+    selected_table.save()
+
+    # Remove the selected table from the session
+    del request.session['selected_table']
+
+    messages.success(request, 'Table is now available.')
+
+    return redirect('eat_in_restaurant:choose_table')
