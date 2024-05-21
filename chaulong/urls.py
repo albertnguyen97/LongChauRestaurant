@@ -26,12 +26,13 @@ urlpatterns = [
     path('account/', include('account.urls')),
     path('warehouse/', include('warehouse.urls')),  # Replace 'your_app' with your actual app name
     path('cart/', include('cart.urls', namespace='cart')),
-    path('order_cart/', include('order_cart.urls', namespace='order_cart')),
+    path('order-cart/', include('order_cart.urls', namespace='order_cart')),
     path('', include('restaurant.urls')),
     path('api/', include('chaulongAPI.urls')),
     path('social-auth/',
          include('social_django.urls', namespace='social')),
     path('eat-in/', include('eat_in_restaurant.urls')),
+    path('blog/', include('blog.urls', namespace='blog')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -11,9 +11,9 @@
         <th>Image</th>
         <th>Dish</th>
         <th>Quantity</th>
-        <th>Remove</th>
         <th>Unit price</th>
         <th>Price</th>
+        <th>Remove</th>
       </tr>
     </thead>
     <tbody>
@@ -21,41 +21,42 @@
         {% with dish=item.dish %}
           <tr>
             <td>
-
+              <!-- Dish image could be placed here -->
             </td>
             <td>
-              {% if dish.id %}{{ dish.name }}{% endif %}</td>
-            <td>
-              <form action="{% url 'cart:cart_add' dish.id %}" method="post">
-                {{ item.update_quantity_form.quantity }}
-                {{ item.update_quantity_form.override }}
-                <input type="submit" value="Update">
-                {% csrf_token %}
-              </form>
+              {% if dish.id %}{{ dish.name }}{% endif %}
             </td>
             <td>
-                <form action="{% if dish.id %}{% url 'cart:cart_remove' dish.id %}{% endif %}" method="post">
-                <input type="submit" value="Remove">
+              <form id="update-quantity-{{ dish.id }}" action="{% url 'cart:cart_add' dish.id %}" method="post">
                 {% csrf_token %}
+                <select name="quantity" onchange="this.form.submit()">
+                  {% for value, label in item.update_quantity_form.fields.quantity.choices %}
+                    <option value="{{ value }}" {% if value == item.quantity %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+                <input type="hidden" name="override" value="True">
               </form>
             </td>
             <td class="num">{{ item.price }} VND</td>
             <td class="num">{{ item.total_price }} VND</td>
+            <td>
+              <form action="{% url 'cart:cart_remove' dish.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Remove">
+              </form>
+            </td>
           </tr>
         {% endwith %}
       {% endfor %}
       <tr class="total">
         <td>Total</td>
-        <td colspan="4"></td>
+        <td colspan="3"></td>
         <td class="num">{{ cart.get_total_price }} VND</td>
       </tr>
     </tbody>
   </table>
   <p class="text-right">
-    <a href="{% url 'menu' %}" class="button
-    light">Continue shopping</a>
-    <a href="{% url 'order_cart:order_create' %}" class="button">
-      Checkout
-    </a>
+    <a href="{% url 'menu' %}" class="button light">Continue shopping</a>
+    <a href="{% url 'order_cart:order_create' %}" class="button">Checkout</a>
   </p>
 {% endblock %}

@@ -9,8 +9,9 @@ from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from warehouse.models import Dish
+from warehouse.models import Dish, Category
 from cart.forms import CartAddDishForm
+
 
 # Create your views here.
 def home(request):
@@ -19,6 +20,10 @@ def home(request):
 
 def about(request):
     return render(request, 'about.html')
+
+
+def event(request):
+    return render(request, 'event.html')
 
 
 def book(request):
@@ -61,12 +66,38 @@ def bookings(request):
     return HttpResponse(booking_json, content_type='application/json')
 
 
+def show_json(request):
+
+    bookings = Booking.objects.all()
+
+    # Serialize the reservation queryset in JSON format
+    booking_data = list(bookings.values())
+
+    # Pass the JSON data to the template
+    context = {
+        'booking_data': booking_data,
+    }
+
+    # Render the template with the JSON data
+    return render(request, 'reservations.html', context)
 # Add your code here to create new views
 
 
 def menu(request):
     menu_data = Dish.objects.all()
-    main_data = {"menu": menu_data}
+    categories = Category.objects.all()
+    for item in menu_data:
+        if item.discounts_dish.exists():
+            # Get the highest discount percentage for the item
+            max_discount_percent = item.discounts_dish.order_by('-discount_percent').first().discount_percent
+            # Calculate discounted price
+            discounted_price = item.price - (item.price * (max_discount_percent / 100))
+            # Assign the discounted price to the item object
+            item.discounted_price = discounted_price
+        else:
+            # If no discount exists, use the original price as the discounted price
+            item.discounted_price = item.price
+    main_data = {"menu": menu_data, "categories": categories}
     return render(request, 'menu.html', main_data)
 
 

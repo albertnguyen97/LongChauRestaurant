@@ -32,6 +32,14 @@
                 {% endfor %}
             </select>
         </div>
+        <div class="combo-list-container">
+            <h2>Combo List</h2>
+            <ul>
+                {% for combo in combos %}
+                    <li><a href="{% url 'combo_detail' combo.id %}">{{ combo.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
         <h2>Dishes:</h2>
 
         <ul class="dish-list" id="dishList">

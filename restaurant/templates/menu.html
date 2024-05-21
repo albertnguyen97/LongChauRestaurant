@@ -1,19 +1,106 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+<style>
+    .menu-original-price {
+        text-decoration: line-through;
+    }
+    .category-button {
+        display: inline-block;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+    .category-button.active {
+        background-color: darkred;
+        color: #fff;
+    }
+</style>
 <h1>Menu</h1>
-<!--Begin col-->
-    <div class="column">
-        {% for item in menu %}
-            <p>
-                <a href="{% url 'menu_item' id=item.pk %}">
-                    {{ item.name }}
-                    </a>
-                <span class="menu-price">
-                    {{ item.price }} VND
-                </span>
-            </p>
-        {% endfor %}
-    </div>
-<!--End col-->
+
+<!-- Search bar -->
+<input type="text" id="searchInput" placeholder="Search for menu items..." onkeyup="filterMenu()">
+
+<!-- Menu categories filter -->
+<h2>Categories</h2>
+<div id="categoryFilter">
+    <button class="category-button" onclick="filterCategory('All')">All</button>
+    {% for category in categories %}
+    <button class="category-button" onclick="filterCategory('{{ category.name }}')">{{ category.name }}</button>
+    {% endfor %}
+</div>
+<select id="sortSelect" onchange="sortMenu()">
+    <option value="name_asc">Sort by name (A-Z)</option>
+    <option value="name_desc">Sort by name (Z-A)</option>
+    <option value="price_asc">Sort by price (low to high)</option>
+    <option value="price_desc">Sort by price (high to low)</option>
+</select>
+<!-- Begin col -->
+<div class="column" id="menuItems">
+    {% for item in menu %}
+    <p class="menuItem" data-categories="{% for category in item.categories.all %}{{ category.name }}{% if not forloop.last %},{% endif %}{% endfor %}">
+        <a href="{% url 'menu_item' id=item.pk %}">
+            {{ item.name }}
+        </a>
+        {% if item.discounted_price and item.discounted_price != item.price %}
+        <span class="menu-original-price">{{ item.price }} VND</span>
+        <span class="menu-discount-price">{{ item.discounted_price }} VND</span>
+        {% else %}
+        <span class="menu-price">{{ item.price }} VND</span>
+        {% endif %}
+    </p>
+    {% endfor %}
+</div>
+<!-- End col -->
+
+<script>
+    function filterMenu() {
+        var input, filter, menuItems, menuItem, itemName, i;
+        input = document.getElementById("searchInput");
+        filter = input.value.toUpperCase();
+        menuItems = document.getElementById("menuItems");
+        menuItem = menuItems.getElementsByClassName("menuItem");
+        for (i = 0; i < menuItem.length; i++) {
+            itemName = menuItem[i].getElementsByTagName("a")[0];
+            if (itemName.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                menuItem[i].style.display = "";
+            } else {
+                menuItem[i].style.display = "none";
+            }
+        }
+    }
+        function filterCategory(categoryName) {
+        var categoryButtons = document.querySelectorAll(".category-button");
+        categoryButtons.forEach(function(button) {
+            if (button.textContent === categoryName) {
+                button.classList.toggle("active");
+            } else {
+                button.classList.remove("active");
+            }
+        });
+
+        var menuItems = document.getElementById("menuItems");
+        var menuItem = menuItems.getElementsByClassName("menuItem");
+
+        for (var i = 0; i < menuItem.length; i++) {
+            var itemCategories = menuItem[i].getAttribute("data-categories").split(",");
+            var showItem = false;
+
+            if (itemCategories.includes(categoryName)) {
+                showItem = true;
+            }
+
+            if (showItem) {
+                menuItem[i].style.display = "";
+            } else {
+                menuItem[i].style.display = "none";
+            }
+        }
+    }
+</script>
 {% endblock %}
+
+

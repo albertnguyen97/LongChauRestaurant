@@ -4,7 +4,7 @@ from .forms import TableForm, OrderForm
 from decimal import Decimal
 from django.shortcuts import render, redirect
 from warehouse.models import Dish, Category
-from .models import Table, Queue
+from .models import Table, Queue, Order
 from .forms import TableForm, OrderForm
 from decimal import Decimal
 from django.contrib import messages  # Import messages module
@@ -181,8 +181,14 @@ def mark_table_not_booked(request):
     selected_table.booked = False
     selected_table.save()
 
-    # Remove the selected table from the session
+    order, _ = Order.objects.get_or_create(selected_table=selected_table)
+
+    finished_dishes = Queue.objects.filter(table_number=selected_table, is_cooked=True)
+
+    order.finished_dishes.add(*finished_dishes)
+    finished_dishes.delete()
     del request.session['selected_table']
+
 
     messages.success(request, 'Table is now available.')
 

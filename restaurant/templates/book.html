@@ -14,10 +14,12 @@
             <!-- {% csrf_token %} -->
             <p>
               <label for="first_name">First Name:</label>
-              <input type="text" placeholder="Your First Name" maxlength="200" required="" id="first_name">
+              <input type="text" placeholder="Your First Name" maxlength="200" required="" id="first_name" {% if user.is_authenticated %}value="{{ user.first_name }}" {% endif %}>
               <label for="last_name">Last Name:</label>
-              <input type="text" placeholder="Your Last Name" maxlength="200" required="" id="last_name">
-              <label for="guest_number">Guest number</label>
+              <input type="text" placeholder="Your Last Name" maxlength="200" required="" id="last_name" {% if user.is_authenticated %}value="{{ user.last_name }}" {% endif %}>
+              <label for="guest_number">Phone number</label>
+              <input   type="text" placeholder="Phone Number" maxlength="200" required="" id="phone_number" {% if user.is_authenticated %}value="{{ user.last_name }}" {% endif %}>
+              <label for="comment">Guest number:</label>
               <input type="text" placeholder="Guest Number" maxlength="200" required="" id="guest_number">
               <label for="comment">Note:</label>
               <input type="text" placeholder="comment" maxlength="200" required="" id="comment">
@@ -25,7 +27,6 @@
                 <label for="reservation_date">Reservation date:</label>
                 <input type="date"  id="reservation_date">
             </p>
-
             <p>
               <label for="reservation_slot">Reservation time:</label>
               <select id="reservation_slot">
@@ -41,7 +42,18 @@
       <!--Begin col-->
       <div class="column">
         <h2>Bookings For <span id="today"></span></h2>
+        <!--Begin col-->
+        <button id="sortButton">Sort Bookings by name</button>
+          <!--End col-->
         <div id="bookings">
+        </div>
+      </div>
+      <div class="column">
+        <div class="videowrap">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d11898.289517452584!2d-87.60853049433447!3d41.79442860243028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880e2912ce6f7027%3A0xc0cfb5545d4a37b2!2sHyde%20Park%2C%20Chicago%2C%20IL%2C%20USA!5e0!3m2!1sen!2spt!4v1662384760663!5m2!1sen!2spt"
+            width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
       </div>
       <!--End col-->
@@ -57,16 +69,14 @@
 
   const date = new Date();
   document.getElementById('reservation_date').value = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-
   console.log(document.getElementById('reservation_date').value);
   getBookings();
-
   /* Step 10: Part two */
   document.getElementById('reservation_date').addEventListener('change', getBookings);
-
   function getBookings() {
     let reservationCounts = {};
     let reserved_slots = [];
+    let bookings = [];
     const date = document.getElementById('reservation_date').value;
     document.getElementById('today').innerHTML = date;
 
@@ -75,19 +85,15 @@
       .then(data => {
         console.log(data);
         reserved_slots = [];
-        let bookings = '';  // Initialize 'bookings' variable
-
         /* Step 11: Part three */
         for (let item of data) {
           console.log(item.fields);
           reserved_slots.push(item.fields.reservation_slot);
-          bookings += `<p>${item.fields.first_name} - ${formatTime(item.fields.reservation_slot)}</p>`; // Concatenate 'bookings'
+          bookings.push(`<p>${item.fields.first_name} - ${formatTime(item.fields.reservation_slot)}</p>`); // Concatenate 'bookings'
           reservationCounts[item.fields.reservation_slot] = (reservationCounts[item.fields.reservation_slot] || 0) + 1;
         }
-
-        /* Step 12: Part four */
+        bookings.sort();
         let slot_options = '<option value="0" disabled>Select time</option>';
-
         for (let i = 11; i < 20; i++) {
           const label = formatTime(i);
 
@@ -105,13 +111,13 @@
 
         // Move this line outside the loop
         document.getElementById('reservation_slot').innerHTML = slot_options;
-
         if (bookings === '') {
           bookings = "No bookings";
         }
-        document.getElementById('bookings').innerHTML = bookings;
+        document.getElementById('bookings').innerHTML = bookings.join('');
       });
   }
+
 
   function formatTime(time) {
     const ampm = time < 12 ? 'AM' : 'PM';
@@ -119,7 +125,6 @@
     const label = `${t} ${ampm}`;
     return label;
   }
-
   document.getElementById('button').addEventListener('click', function (e) {
     const formdata = {
       first_name: document.getElementById('first_name').value,

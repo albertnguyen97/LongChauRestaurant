@@ -1,0 +1,40 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<section>
+  <article>
+    <h1>Events</h1>
+    <!--Begin row-->
+    <div class="row">
+      <!--Begin col-->
+      <div class="column">
+        <h1>My Blog</h1>
+        {% for post in posts %}
+        <h2>
+           <a href="{{ post.get_absolute_url }}">
+           {{ post.title }}
+           </a>
+        </h2>
+        <p class="date">
+        Published {{ post.publish }} by {{ post.author }}
+        </p>
+        {{ post.body|truncatewords:30|linebreaks }}
+        {% endfor %}
+      </div>
+      <!--End col-->
+
+      <!--Begin col-->
+      <div class="column">
+        <figure class="figure">
+          <img
+            src="{% static 'img/chauandbau.jpeg' %}"
+            alt="Mario and Adrian"
+          />
+          <figcaption class="figure-caption">
+            Chau Long Restaurant owners Chau and Bau.
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+    <!--End row-->
+  </article>
+</section>
+{% endblock %}

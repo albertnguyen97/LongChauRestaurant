@@ -43,8 +43,9 @@
     <li><a href="{% url 'home' %}">Home</a></li>
     <li><a href="{% url 'about' %}">About</a></li>
     <li><a href="{% url 'menu' %}">Menu</a></li>
+      <li><a href="{% url 'blog:post_list' %}">Events</a></li>
     <li><a href="{% url 'book' %}">Book</a></li>
-    <li><a href="{% url 'bookings' %}">Reservations</a></li>
+    <li><a href="{% url 'reservations' %}">Reservations</a></li>
     {% if request.user.is_authenticated %}
         <li><a href="{% url 'eat_in_restaurant:choose_table' %}">eat-in</a></li>
     {% endif %}

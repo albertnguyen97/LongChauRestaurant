@@ -14,33 +14,21 @@
 
 <p>Selected Table: {{ selected_table }}</p>
 
-<h2>Selected Dishes and Quantities</h2>
-{% if selected_dishes_quantities %}
+<h2>Finished Dishes</h2>
+{% if finished_dishes %}
     <ul>
-        {% for dish, quantity in selected_dishes_quantities.items %}
-            <li>{{ dish.name }} - Quantity: {{ quantity }}</li>
+        {% for dish in finished_dishes %}
+            <li>{{ dish.dish.name }}</li>
         {% endfor %}
     </ul>
 
-    <h2>Returned Dishes</h2>
-    {% if returned_dishes %}
-        <ul>
-            {% for dish in returned_dishes %}
-                <li>{{ dish.name }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No dishes can be returned.</p>
-    {% endif %}
-
-    <h2>Discount Information</h2>
-    <p>Discount Percentage: {{ discount_percentage }}%</p>
-    <p>Discounted Total: VND{{ discounted_total }}</p>
+    <h2>Total Price</h2>
+    <p>Total Price: VND{{ total_price }}</p>
 
     <!-- Finish Button Form -->
     <form method="post" action="{% url 'eat_in_restaurant:mark_table_not_booked' %}">
         {% csrf_token %}
-        <button type="submit" {% if not selected_dishes_quantities %}disabled{% endif %}>Finish</button>
+        <button type="submit">Finish</button>
     </form>
 {% else %}
     <p>No dishes finished. Please go back and select some dishes.</p>

@@ -8,6 +8,9 @@ urlpatterns = [
     path('about/', views.about, name="about"),
     path('book/', views.book, name="book"),
     path('menu/', views.menu, name="menu"),
+    path('events/', views.event, name="event"),
     path('menu_item/<int:id>/', views.display_menu_item, name="menu_item"),
     path('bookings/', views.bookings, name="bookings"),
+    path('reservations/', views.show_json, name="reservations"),
+
 ]
