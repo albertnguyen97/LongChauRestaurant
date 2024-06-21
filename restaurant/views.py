@@ -11,7 +11,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from warehouse.models import Dish, Category
 from cart.forms import CartAddDishForm
-
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import render
+from .recommender import Recommender
 
 # Create your views here.
 def home(request):
@@ -67,7 +69,6 @@ def bookings(request):
 
 
 def show_json(request):
-
     bookings = Booking.objects.all()
 
     # Serialize the reservation queryset in JSON format
@@ -80,12 +81,26 @@ def show_json(request):
 
     # Render the template with the JSON data
     return render(request, 'reservations.html', context)
+
+
 # Add your code here to create new views
 
 
 def menu(request):
     menu_data = Dish.objects.all()
     categories = Category.objects.all()
+    # Pagination
+    paginator = Paginator(menu_data, 20)  # Show 10 items per page
+
+    page_number = request.GET.get('page')
+    try:
+        menu_data = paginator.page(page_number)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        menu_data = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        menu_data = paginator.page(paginator.num_pages)
     for item in menu_data:
         if item.discounts_dish.exists():
             # Get the highest discount percentage for the item
@@ -97,6 +112,7 @@ def menu(request):
         else:
             # If no discount exists, use the original price as the discounted price
             item.discounted_price = item.price
+
     main_data = {"menu": menu_data, "categories": categories}
     return render(request, 'menu.html', main_data)
 
@@ -104,5 +120,8 @@ def menu(request):
 def display_menu_item(request, id):
     dish = get_object_or_404(Dish, id=id, is_available=True)
     cart_dish_form = CartAddDishForm()
-    return render(request, 'menu_item.html', {'dish': dish, 'cart_dish_form': cart_dish_form})
-
+    r = Recommender()
+    recommended_dishes = r.suggest_dishes_for([dish], 4)
+    return render(request, 'menu_item.html', {'dish': dish, 'cart_dish_form': cart_dish_form,
+                                              'recommended_dishes': recommended_dishes
+                                              })

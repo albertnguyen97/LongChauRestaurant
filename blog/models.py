@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
 import os
+from django_ckeditor_5.fields import CKEditor5Field
+from taggit.managers import TaggableManager
 
 
 class PublishedManager(models.Manager):
@@ -24,7 +26,7 @@ class Post(models.Model):
     slug = models.SlugField(max_length=250, unique_for_date='publish')
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name='blog_posts', default='')
-    body = models.TextField()
+    body = CKEditor5Field()
     pdf_file = models.FileField(upload_to=get_pdf_file_name, blank=True, null=True)
     publish = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
@@ -34,6 +36,7 @@ class Post(models.Model):
                               default=Status.DRAFT)
     objects = models.Manager()
     published = PublishedManager()
+    tags = TaggableManager()
 
     class Meta:
         ordering = ['-publish']

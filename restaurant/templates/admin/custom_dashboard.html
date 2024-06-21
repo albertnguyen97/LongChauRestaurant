@@ -1,0 +1,76 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="module">
+    <table>
+        <tr>
+            <td>
+                <canvas id="ingredientChart"></canvas>
+            </td>
+            <td>
+                <canvas id="dishChart"></canvas>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Ingredient Chart
+    var ingredientLabels = {{ ingredient_labels|safe }};
+    var ingredientQuantities = {{ ingredient_quantities|safe }};
+
+    var ingredientCtx = document.getElementById('ingredientChart').getContext('2d');
+    var ingredientChart = new Chart(ingredientCtx, {
+        type: 'bar',
+        data: {
+            labels: ingredientLabels,
+            datasets: [{
+                label: 'Ingredient Quantities',
+                data: ingredientQuantities,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    // Dish Chart
+    var dishLabels = {{ dish_labels|safe }};
+    var dishOrders = {{ dish_orders|safe }};
+
+    var dishCtx = document.getElementById('dishChart').getContext('2d');
+    var dishChart = new Chart(dishCtx, {
+        type: 'bar',
+        data: {
+            labels: dishLabels,
+            datasets: [{
+                label: 'Dish Orders',
+                data: dishOrders,
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+{% endblock %}

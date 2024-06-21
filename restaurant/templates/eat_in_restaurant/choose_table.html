@@ -8,12 +8,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="{% static 'css/choose_table_styles.css' %}">
     <style>
-        /* Add your CSS styles for the map container here */
+        .center {
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Adjust based on your layout */
+        }
+
         #tableMap {
-            width: 750px; /* Set the width of your image */
-            height: 531px; /* Set the height of your image */
+            width: 50%; /* Set the width of your image */
+            height: 600px; /* Set the height of your image */
             position: relative;
-            margin-top: 20px;
+            margin: auto;
         }
         .table-marker {
             width: 30px;
@@ -40,42 +45,42 @@
 </head>
 <body>
     <h1>Choose Table</h1>
-    <div id="tableMap">
-        <img src="{% static 'img/table_map.png' %}" alt="Table Map" style="width: 100%; height: 100%;">
+    <div id="tableMap" class="center">
+        <img src="{% static 'img/restaurant_map.png' %}" alt="Table Map" style="width: 100%; height: 100%;">
     </div>
 
-    <form method="post">
+    <form method="post" id="tableForm">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="hidden" id="selectedTable" name="selectedTable" value="">
         <button type="submit">Next</button>
     </form>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const tableMap = document.getElementById('tableMap');
-            const selectedTableInput = document.getElementById('selectedTable');
-            const form = document.querySelector('form');
+            const form = document.getElementById('tableForm');
+            let selectedTableId = null;
+
             const tableMarkers = [
-                { id: 1, left: '10%', top: '10%' },
-                { id: 2, left: '30%', top: '10%' },
-                { id: 3, left: '65%', top: '10%' },
-                { id: 4, left: '85%', top: '10%' },
-                { id: 5, left: '5%', top: '30%' },
-                { id: 6, left: '5%', top: '50%' },
-                { id: 7, left: '5%', top: '70%' },
-                { id: 8, left: '25%', top: '30%' },
-                { id: 9, left: '40%', top: '30%' },
-                { id: 10, left: '25%', top: '45%' },
-                { id: 11, left: '40%', top: '45%' },
-                { id: 12, left: '25%', top: '60%' },
-                { id: 13, left: '40%', top: '60%' },
-                { id: 14, left: '60%', top: '30%' },
-                { id: 15, left: '60%', top: '45%' },
-                { id: 16, left: '60%', top: '60%' },
-                { id: 17, left: '70%', top: '30%' },
-                { id: 18, left: '70%', top: '45%' },
-                { id: 19, left: '70%', top: '60%' },
+                { id: 1, left: '8.5%', top: '10%' },
+                { id: 2, left: '25%', top: '10%' },
+                { id: 3, left: '55%', top: '10%' },
+                { id: 4, left: '71.5%', top: '10%' },
+                { id: 5, left: '5%', top: '25%' },
+                { id: 6, left: '5%', top: '40%' },
+                { id: 7, left: '5%', top: '55%' },
+                { id: 8, left: '24%', top: '25%' },
+                { id: 9, left: '33%', top: '25%' },
+                { id: 10, left: '24%', top: '40%' },
+                { id: 11, left: '33%', top: '40%' },
+                { id: 12, left: '24%', top: '55%' },
+                { id: 13, left: '33%', top: '55%' },
+                { id: 14, left: '50%', top: '25%' },
+                { id: 15, left: '50%', top: '40%' },
+                { id: 16, left: '60%', top: '55%' },
+                { id: 17, left: '60%', top: '25%' },
+                { id: 18, left: '50%', top: '55%' },
+                { id: 19, left: '60%', top: '40%' },
                 { id: 20, left: '90%', top: '30%' },
                 { id: 21, left: '90%', top: '40%' },
                 { id: 22, left: '90%', top: '50%' },
@@ -97,15 +102,20 @@
 
                 // Add click event to select the table
                 tableMarker.addEventListener('click', function () {
-                    selectedTableInput.value = marker.id;
+                    if (tableMarker.classList.contains('booked')) {
+                        return; // Do nothing if the table is booked
+                    }
 
-                    // Example: Remove styling from previously selected tables
+                    // Remove styling from previously selected tables
                     document.querySelectorAll('.table-marker').forEach(el => {
                         el.classList.remove('selected');
                     });
 
-                    // Example: Add styling to the selected table marker
+                    // Add styling to the selected table marker
                     tableMarker.classList.add('selected');
+
+                    // Set the selected table ID
+                    selectedTableId = marker.id;
                 });
 
                 tableMap.appendChild(tableMarker);
@@ -113,23 +123,21 @@
 
             form.addEventListener('submit', function (event) {
                 // Ensure a table is selected before submitting the form
-                if (!selectedTableInput.value) {
+                if (!selectedTableId) {
                     alert("Please select a table before proceeding.");
                     event.preventDefault(); // Prevent the form from submitting
                     return;
                 }
 
-                // Your form submission logic here (e.g., using AJAX)
-                // For demonstration purposes, alert the selected table ID
-                alert("Selected Table: " + selectedTableInput.value);
+                // Create a hidden input to store the selected table ID
+                const selectedTableInput = document.createElement('input');
+                selectedTableInput.type = 'hidden';
+                selectedTableInput.name = 'selected_table';
+                selectedTableInput.value = selectedTableId;
+                form.appendChild(selectedTableInput);
 
-                // Reset the selected table styling if needed
-                document.querySelectorAll('.table-marker').forEach(el => {
-                    el.classList.remove('selected');
-                });
-
-                // Clear the selected table value
-                selectedTableInput.value = '';
+                // Optionally, alert the selected table ID for debugging
+                // alert("Selected Table: " + selectedTableId);
             });
 
             function isTableBooked(tableId) {

@@ -1,15 +1,21 @@
 {% load static %}
+{% load i18n %}.
 <header>
     <div class="navbar">
       <div class="navbar-content">
-                    <div class="language-switch">
-                        <label for="language-select">Language:</label>
-                        <select id="language-select">
-                            <option value="en">English</option>
-                            <option value="vi">Vietnamese</option>
-                        </select>
-                    </div>
-<!--                <div class="logo">Your Logo</div>-->
+            {% get_current_language as LANGUAGE_CODE %}
+            {% get_available_languages as LANGUAGES %}
+            {% get_language_info_list for LANGUAGES as languages %}
+              <div class="language-switch">
+                    <label for="language-select">{% translate "Language" %}:</label>
+                    <select id="language-select" onchange="location = this.value;">
+                        {% for language in languages %}
+                            <option value="/{{ language.code }}/" {% if language.code == LANGUAGE_CODE %}selected{% endif %}>
+                                {{ language.name_local }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <div class="navbar-links">
                     <div class="account">
                         {% with total_items=cart|length %}
@@ -28,6 +34,7 @@
                     <a href="#" class="notification"><i class="fas fa-bell"></i></a>
                 {% if request.user.is_authenticated %}
                     <div class="account">Hello, {{ request.user.username }}</div>
+                    <a href="{% url 'settings' %}">Settings</a>
                     <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="account" type="submit">Log Out</button ></form>
                     {% else %}
                     <!-- User is not logged in -->
@@ -42,12 +49,12 @@
   <ul>
     <li><a href="{% url 'home' %}">Home</a></li>
     <li><a href="{% url 'about' %}">About</a></li>
-    <li><a href="{% url 'menu' %}">Menu</a></li>
+    <li><a href="{% url 'menu' %}">Order</a></li>
       <li><a href="{% url 'blog:post_list' %}">Events</a></li>
     <li><a href="{% url 'book' %}">Book</a></li>
-    <li><a href="{% url 'reservations' %}">Reservations</a></li>
-    {% if request.user.is_authenticated %}
-        <li><a href="{% url 'eat_in_restaurant:choose_table' %}">eat-in</a></li>
+      {% if request.user.is_staff %}
+        <li><a href="{% url 'reservations' %}">Reservations</a></li>
+        <li><a href="{% url 'eat_in_restaurant:choose_table' %}">Eat-in</a></li>
     {% endif %}
   </ul>
 </nav>

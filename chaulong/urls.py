@@ -19,20 +19,23 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.views import TokenBlacklistView
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls.i18n import i18n_patterns
 
 
-urlpatterns = [
+urlpatterns = i18n_patterns(
     path('admin/', admin.site.urls),
     path('account/', include('account.urls')),
     path('warehouse/', include('warehouse.urls')),  # Replace 'your_app' with your actual app name
     path('cart/', include('cart.urls', namespace='cart')),
+    path('payment/', include('payment.urls', namespace='payment')),
     path('order-cart/', include('order_cart.urls', namespace='order_cart')),
     path('', include('restaurant.urls')),
     path('api/', include('chaulongAPI.urls')),
-    path('social-auth/',
-         include('social_django.urls', namespace='social')),
+    path('social-auth/', include('social_django.urls', namespace='social')),
     path('eat-in/', include('eat_in_restaurant.urls')),
     path('blog/', include('blog.urls', namespace='blog')),
-]
+    path("ckeditor5/", include('django_ckeditor_5.urls')),
+    path('rosetta/', include('rosetta.urls')),
+)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

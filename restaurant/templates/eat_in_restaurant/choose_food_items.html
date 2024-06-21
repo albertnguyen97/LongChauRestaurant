@@ -1,7 +1,7 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,7 +48,7 @@
                     <label>
                         <div class="dish-box">
                             <img src="{{ dish.image.url }}" alt="{{ dish.name }}">
-                            <span class="dish-name">{{ dish.name }}</span>
+                            <span class="dish-name">{{ dish.name }}</span><br>
                             <span class="dish-name">{{ dish.price }} VND</span>
                         </div>
                         <div class="quantity-control">
@@ -146,13 +146,23 @@
             const finishedDishesList = document.getElementById("finishedDishesList");
             finishedDishesList.innerHTML = ""; // Clear existing list
 
-            data.finished_dishes.forEach(dish => {
-              const listItem = document.createElement("li");
-              listItem.textContent = dish;
-              finishedDishesList.appendChild(listItem);
-            });
+            if (data.finished_dishes.length === 0) {
+                const listItem = document.createElement("li");
+                listItem.textContent = "No finished dishes yet";
+                finishedDishesList.appendChild(listItem);
+            } else {
+                data.finished_dishes.forEach(dish => {
+                  const listItem = document.createElement("li");
+                  listItem.textContent = dish;
+                  finishedDishesList.appendChild(listItem);
+                });
+            }
+          })
+          .catch(error => {
+              console.error('Error fetching finished dishes:', error);
           });
     }
+
 
     document.querySelector('.show-finished-btn').addEventListener('click', function(event) {
         event.preventDefault();  // Prevent the default behavior of the link

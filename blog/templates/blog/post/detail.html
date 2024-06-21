@@ -1,9 +1,8 @@
+
 {% extends 'base.html' %} {% load static %} {% block content %}
    <h1>{{ post.title }}</h1>
    <p>Published on {{ post.publish }}</p>
    <p>By {{ post.author }}</p>
-   <p>{{ post.body }}</p>
-   {% if post.pdf_file %}
-       <!-- Embed PDF viewer -->
-   {% endif %}
+   <p>{{ post.body | safe }}</p>
 {% endblock %}
+<script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/emoji/ckeditor.js"></script>

@@ -3,14 +3,7 @@ from .models import Table  # Replace `.models` with the actual path to your mode
 
 
 class TableForm(forms.Form):
-    table_choices = [(table.table_id, f'Table {table.table_id}') for table in Table.objects.filter(booked=False)]
-
-    table = forms.ChoiceField(
-        label='Select Table',
-        choices=[('', 'Select a Table')] + table_choices,
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        required=True
-    )
+    selected_table = forms.IntegerField(widget=forms.HiddenInput())
 
 
 class OrderForm(forms.Form):

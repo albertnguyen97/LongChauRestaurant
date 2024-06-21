@@ -2,7 +2,7 @@ from django.db import models
 from warehouse.models import Dish
 
 
-class Order(models.Model):
+class OrderCart(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.EmailField()
@@ -12,6 +12,7 @@ class Order(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     paid = models.BooleanField(default=False)
+    stripe_id = models.CharField(max_length=250, blank=True)
 
     class Meta:
         ordering = ['-created']
@@ -26,8 +27,8 @@ class Order(models.Model):
         return sum(item.get_cost() for item in self.items.all())
 
 
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order,
+class OrderItemCart(models.Model):
+    order = models.ForeignKey(OrderCart,
                               related_name='items',
                               on_delete=models.CASCADE)
     dish = models.ForeignKey(Dish,
@@ -36,7 +37,9 @@ class OrderItem(models.Model):
     price = models.DecimalField(max_digits=10,
                                 decimal_places=3)
     quantity = models.PositiveIntegerField(default=1)
+
     def __str__(self):
         return str(self.id)
+
     def get_cost(self):
-        return self.price * self.quantity
+        return round(self.price * self.quantity)

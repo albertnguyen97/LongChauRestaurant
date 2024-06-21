@@ -1,13 +1,32 @@
 from django.contrib import admin
 from .models import Post
+from django.core.paginator import Paginator
+from django_ckeditor_5.widgets import CKEditor5Widget
+from django import forms
 
 
-@admin.register(Post)
+# Custom paginator with a fixed count of 50
+class CustomPaginator(Paginator):
+    def _get_count(self):
+        return 50
+
+
+class PostAdminForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = '__all__'
+        widgets = {
+            'body': CKEditor5Widget(),  # Use CKEditorWidget for the body field
+        }
+
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['title', 'slug', 'author', 'publish', 'status']
-    list_filter = ['status', 'created', 'publish', 'author']
-    search_fields = ['title', 'body']
+    form = PostAdminForm
+    list_display = ('title', 'author', 'publish', 'status')
+    list_filter = ('status', 'created', 'publish', 'author')
+    search_fields = ('title', 'body')
     prepopulated_fields = {'slug': ('title',)}
-    raw_id_fields = ['author']
     date_hierarchy = 'publish'
     ordering = ['status', 'publish']
+
+
+admin.site.register(Post, PostAdmin)

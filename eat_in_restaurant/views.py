@@ -10,6 +10,7 @@ from decimal import Decimal
 from django.contrib import messages  # Import messages module
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.db.models import QuerySet
 
 
 @login_required
@@ -17,7 +18,7 @@ def choose_table(request):
     if request.method == 'POST':
         form = TableForm(request.POST)
         if form.is_valid():
-            selected_table_id = form.cleaned_data['table']
+            selected_table_id = form.cleaned_data['selected_table']
 
             # Get the selected table object
             selected_table = Table.objects.get(table_id=selected_table_id)
@@ -35,7 +36,6 @@ def choose_table(request):
         form = TableForm()
     tables = Table.objects.all()
     return render(request, 'eat_in_restaurant/choose_table.html', {'form': form, 'tables': tables})
-
 
 @login_required
 def choose_food_items(request):
@@ -185,11 +185,15 @@ def mark_table_not_booked(request):
 
     finished_dishes = Queue.objects.filter(table_number=selected_table, is_cooked=True)
 
-    order.finished_dishes.add(*finished_dishes)
-    finished_dishes.delete()
-    del request.session['selected_table']
+    # Check if there are finished dishes
+    if finished_dishes:
+        for dish in finished_dishes:
+            order.finished_dishes.append(dish)
+        finished_dishes.delete()
 
+    del request.session['selected_table']
 
     messages.success(request, 'Table is now available.')
 
     return redirect('eat_in_restaurant:choose_table')
+

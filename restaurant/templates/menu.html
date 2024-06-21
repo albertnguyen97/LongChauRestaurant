@@ -18,6 +18,9 @@
         background-color: darkred;
         color: #fff;
     }
+    .menu-category {
+    display: none;
+    }
 </style>
 <h1>Menu</h1>
 
@@ -27,9 +30,9 @@
 <!-- Menu categories filter -->
 <h2>Categories</h2>
 <div id="categoryFilter">
-    <button class="category-button" onclick="filterCategory('All')">All</button>
+    <button class="category-button active" onclick="filterCategory('All')">All</button>
     {% for category in categories %}
-    <button class="category-button" onclick="filterCategory('{{ category.name }}')">{{ category.name }}</button>
+    <button class="category-button active" onclick="filterCategory('{{ category.name }}')">{{ category.name }}</button>
     {% endfor %}
 </div>
 <select id="sortSelect" onchange="sortMenu()">
@@ -41,18 +44,36 @@
 <!-- Begin col -->
 <div class="column" id="menuItems">
     {% for item in menu %}
-    <p class="menuItem" data-categories="{% for category in item.categories.all %}{{ category.name }}{% if not forloop.last %},{% endif %}{% endfor %}">
-        <a href="{% url 'menu_item' id=item.pk %}">
-            {{ item.name }}
-        </a>
-        {% if item.discounted_price and item.discounted_price != item.price %}
-        <span class="menu-original-price">{{ item.price }} VND</span>
-        <span class="menu-discount-price">{{ item.discounted_price }} VND</span>
-        {% else %}
-        <span class="menu-price">{{ item.price }} VND</span>
-        {% endif %}
-    </p>
+        <p class="menuItem" data-category="{{ item.category }}">
+            <span class="menu-category">{{ item.category }}</span>
+            <a href="{% url 'menu_item' id=item.pk %}">
+                {{ item.name }}
+            </a><br/>
+            {% if item.discounted_price and item.discounted_price != item.price %}
+            <span class="menu-original-price">{{ item.price }} VND</span>
+            <span class="menu-discount-price">{{ item.discounted_price }} VND</span>
+            {% else %}
+            <span class="menu-price">{{ item.price }} VND</span>
+            {% endif %}
+        </p>
     {% endfor %}
+</div>
+<div class="pagination">
+    <span class="step-links">
+        {% if menu.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ menu.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ menu.number }} of {{ menu.paginator.num_pages }}.
+        </span>
+
+        {% if menu.has_next %}
+            <a href="?page={{ menu.next_page_number }}">next</a>
+            <a href="?page={{ menu.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
 </div>
 <!-- End col -->
 
@@ -72,34 +93,62 @@
             }
         }
     }
-        function filterCategory(categoryName) {
-        var categoryButtons = document.querySelectorAll(".category-button");
-        categoryButtons.forEach(function(button) {
-            if (button.textContent === categoryName) {
-                button.classList.toggle("active");
-            } else {
-                button.classList.remove("active");
-            }
-        });
 
-        var menuItems = document.getElementById("menuItems");
-        var menuItem = menuItems.getElementsByClassName("menuItem");
+function filterCategory(categoryName) {
+    // Get all menu items
+    var menuItems = document.querySelectorAll(".menuItem");
 
-        for (var i = 0; i < menuItem.length; i++) {
-            var itemCategories = menuItem[i].getAttribute("data-categories").split(",");
-            var showItem = false;
+    // Iterate over each menu item
+    menuItems.forEach(function(item) {
+        // Get the category of the dish associated with the menu item
+        var dishCategory = item.dataset.category;
 
-            if (itemCategories.includes(categoryName)) {
-                showItem = true;
-            }
-
-            if (showItem) {
-                menuItem[i].style.display = "";
-            } else {
-                menuItem[i].style.display = "none";
-            }
+        // Compare the dish category with the selected category name
+        if (dishCategory === categoryName || categoryName === "All") {
+            // Show the menu item if it matches the selected category or if "All" is selected
+            item.style.display = "";
+        } else {
+            // Hide the menu item if it doesn't match the selected category
+            item.style.display = "none";
         }
+        console.log(item);
+    });
+}
+function sortMenu() {
+    // Get the selected sort option
+    var sortOption = document.getElementById("sortSelect").value;
+
+    // Get all menu items
+    var menuItems = document.querySelectorAll(".menuItem");
+
+    // Convert NodeList to an array for easier manipulation
+    var menuArray = Array.from(menuItems);
+
+    // Sort the menu items based on the selected sort option
+    switch (sortOption) {
+        case "name_asc":
+            menuArray.sort((a, b) => a.textContent.trim().localeCompare(b.textContent.trim()));
+            break;
+        case "name_desc":
+            menuArray.sort((a, b) => b.textContent.trim().localeCompare(a.textContent.trim()));
+            break;
+        case "price_asc":
+            menuArray.sort((a, b) => parseFloat(a.dataset.price) - parseFloat(b.dataset.price));
+            break;
+        case "price_desc":
+            menuArray.sort((a, b) => parseFloat(b.dataset.price) - parseFloat(a.dataset.price));
+            break;
     }
+
+    // Re-append sorted menu items to their container
+    const menuContainer = document.getElementById("menuItems");
+    menuContainer.innerHTML = ""; // Clear existing content
+    menuArray.forEach(function(item) {
+        menuContainer.appendChild(item);
+    });
+
+}
+
 </script>
 {% endblock %}
 

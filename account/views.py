@@ -41,6 +41,8 @@ def setting(request):
                   {'section': 'settings'})
 
 
+from django.contrib.auth.models import User
+
 def register(request):
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
@@ -50,6 +52,8 @@ def register(request):
             # Set the chosen password
             new_user.set_password(
                 user_form.cleaned_data['password'])
+            # Set the user as not staff
+            new_user.is_staff = False
             # Save the User object
             new_user.save()
             Profile.objects.create(user=new_user)
@@ -61,6 +65,7 @@ def register(request):
     return render(request,
                   'account/register.html',
                   {'user_form': user_form})
+
 
 
 @login_required
