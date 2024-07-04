@@ -30,7 +30,7 @@ docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.13.1-
 celery chaulong worker -l info
 docker run -it --rm --name redis -p 6379:6379 redis:7.2.4
 
-# cai dat thu vien cho celery
+# cai dat thu vien bo xung
 
 pip install celery python-decouple
 
