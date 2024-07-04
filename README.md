@@ -45,4 +45,7 @@ pip install django-bleach
 pip install tinycss2
 pip install django-summernote
 
-# sau khi cai het thu vien thi 
+# cat dat stripe
+stripe cli
+
+
