@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'django_ckeditor_5',
     'payment.apps.PaymentConfig',
     'rosetta',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -310,3 +311,8 @@ REDIS_DB = 1
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
+
+GRAPH_MODELS = {
+    "all_applications": True,
+    'group_models': True,
+}

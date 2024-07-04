@@ -4,7 +4,7 @@ from .forms import TableForm, OrderForm
 from decimal import Decimal
 from django.shortcuts import render, redirect
 from warehouse.models import Dish, Category
-from .models import Table, Queue, Order
+from .models import Table, Queue, Order, Invoice
 from .forms import TableForm, OrderForm
 from decimal import Decimal
 from django.contrib import messages  # Import messages module
@@ -180,16 +180,36 @@ def mark_table_not_booked(request):
     selected_table = get_object_or_404(Table, table_id=selected_table_id)
     selected_table.booked = False
     selected_table.save()
-
     order, _ = Order.objects.get_or_create(selected_table=selected_table)
-
     finished_dishes = Queue.objects.filter(table_number=selected_table, is_cooked=True)
+    if finished_dishes.exists():
+        finished_dishes_list = []
+        total_amount = 0
 
-    # Check if there are finished dishes
-    if finished_dishes:
         for dish in finished_dishes:
-            order.finished_dishes.append(dish)
+            dish_data = {
+                'dish_id': dish.dish.id,
+                'dish_name': dish.dish.name,
+                'price': int(dish.dish.price),  # Ensure price is a float for JSON serialization
+            }
+            finished_dishes_list.append(dish_data)
+        order.finished_dishes = finished_dishes_list
+        order.total_amount = sum(dish.dish.price for dish in finished_dishes)
+
+        order.save()
         finished_dishes.delete()
+        order_data = {
+            'selected_table': order.selected_table,
+            'finished_dishes': order.finished_dishes,
+        }
+
+        # Create an Invoice for the new Order
+        invoice = Invoice.objects.create(
+            order=order,
+            order_data=order_data,
+            total_amount=order.total_amount
+        )
+        invoice.save()
 
     del request.session['selected_table']
 

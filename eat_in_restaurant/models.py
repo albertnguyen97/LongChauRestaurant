@@ -1,3 +1,5 @@
+import uuid
+
 from django.utils import timezone
 from django.db import models
 from warehouse.models import Dish, Distributor, Category # Import the FoodItem model
@@ -21,11 +23,16 @@ class Order(models.Model):
         return f"Order for Table {self.selected_table}"
 
 
+def generate_code_invoice():
+    return f"{timezone.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:6]}"
+
 class Invoice(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    order_data = models.JSONField(default={})  # To store serialized order data
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     issued_at = models.DateTimeField(default=timezone.now)
     payment_status = models.CharField(max_length=50, choices=[('pending', 'Pending'), ('paid', 'Paid')], default='pending')
+    code_invoice = models.CharField(max_length=100, unique=True, editable=False, default=generate_code_invoice)
 
     def __str__(self):
         return f"Invoice for Order {self.order_id}"

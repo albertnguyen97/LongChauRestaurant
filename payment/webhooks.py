@@ -3,8 +3,8 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from order_cart.models import OrderCart
-
-
+from restaurant.recommender import Recommender
+from warehouse.models import Dish
 @csrf_exempt
 def stripe_webhook(request):
     payload = request.body
@@ -32,5 +32,10 @@ def stripe_webhook(request):
             order.paid = True
             order.stripe_id = session.payment_intent
             order.save()
+            dishes_ids = order.items.values_list('dish_id')
+            dishes = Dish.objects.filter(id__in=dishes_ids)
+            r = Recommender()
+            r.dishes_bought(dishes)
+            # payment_completed.delay(order.id)
     return HttpResponse(status=200)
 

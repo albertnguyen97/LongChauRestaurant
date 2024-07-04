@@ -73,7 +73,7 @@ class Dish(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('restaurant:display_menu_item', arg='self.id')
+        return reverse('restaurant:display_menu_item', args='self.id')
 
 
 class Discount(models.Model):
