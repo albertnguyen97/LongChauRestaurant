@@ -47,5 +47,14 @@ pip install django-summernote
 
 # cat dat stripe
 stripe cli
+Minh hoa 1 vai chuc nang
+![image](https://github.com/user-attachments/assets/acc217bd-da5f-48bd-868b-04bb115b5a19)
+![image](https://github.com/user-attachments/assets/32303a46-de84-476c-9fe7-910dddf38a8d)
+![image](https://github.com/user-attachments/assets/9f301844-77d1-421a-b91f-a6a548575eb5)
+![image](https://github.com/user-attachments/assets/6bb06853-46ec-4efd-ad6d-a22e72a5279b)
+![image](https://github.com/user-attachments/assets/25d442d5-f5fe-4b39-99ba-b434bf3c826b)
+
+
+
 
 
